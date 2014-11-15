@@ -1,0 +1,6 @@
+name: mruby-curses
+description: Curses class
+author: Kotaro Hibi
+website: https://github.com/KotaroHibi/mruby-curses
+protocol: git
+repository: https://github.com/KotaroHibi/mruby-curses.git
