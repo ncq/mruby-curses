@@ -8,7 +8,7 @@ MRuby::Build.new do |conf|
 
     # ... (snip) ...
 
-    conf.gem :git => 'https://github.com/KotaroHibi/mruby-curses.git'
+    conf.gem :git => 'https://github.com/ncq/mruby-curses.git'
 end
 ```
 ## example 
