@@ -1,7 +1,12 @@
 # mruby-curses   [![Build Status](https://travis-ci.org/KotaroHibi/mruby-curses.png?branch=master)](https://travis-ci.org/KotaroHibi/mruby-curses)
-Curses class
+use ncurses methods from mruby.
+
+## requirement
+This gem uses the ncurses library.  
+If you have not installed the ncurses, please install the ncurses.
+
 ## install by mrbgems 
-- add conf.gem line to `build_config.rb` 
+add conf.gem line to `build_config.rb` 
 
 ```ruby
 MRuby::Build.new do |conf|
