@@ -118,6 +118,26 @@ mrb_curses_move(mrb_state *mrb, mrb_value self)
   return mrb_bool_value(true);
 }
 
+static mrb_value
+mrb_curses_newwin(mrb_state *mrb, mrb_value self)
+{
+  mrb_value nlines, ncols, begin_y, begin_x;
+  mrb_get_args(mrb, "iiii", &nlines, &ncols, &begin_y, &begin_x);
+  WINDOW *newwin(mrb_fixnum(nlines), mrb_fixnum(ncols), mrb_fixnum(begin_y), mrb_fixnum(begin_x));
+  return mrb_bool_value(true);
+}
+
+/*
+static mrb_value
+mrb_curses_getmaxyx(mrb_state *mrb, mrb_value self)
+{
+  mrb_value y, x;
+  mrb_get_args(mrb, "ii", &v1, &v2);
+  move(mrb_fixnum(v1), mrb_fixnum(v2));
+  return mrb_bool_value(true);
+}
+*/
+
 void mrb_mruby_curses_gem_init(mrb_state *mrb)
 {
     struct RClass *curses;
@@ -133,6 +153,8 @@ void mrb_mruby_curses_gem_init(mrb_state *mrb)
     mrb_define_class_method(mrb, curses, "addstr", mrb_curses_addstr, MRB_ARGS_REQ(1));
     mrb_define_class_method(mrb, curses, "move", mrb_curses_move, MRB_ARGS_ANY());
     mrb_define_class_method(mrb, curses, "endwin", mrb_curses_endwin, MRB_ARGS_NONE());
+    mrb_define_class_method(mrb, curses, "newwin", mrb_curses_newwin, MRB_ARGS_ANY());
+    //mrb_define_class_method(mrb, curses, "getmaxyx", mrb_curses_getmaxyx, MRB_ARGS_NONE());
     DONE;
 }
 
