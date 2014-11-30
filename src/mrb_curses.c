@@ -22,9 +22,23 @@ typedef struct {
   int len;
 } mrb_curses_data;
 
+struct windata{
+  WINDOW *window;
+};
+
 static const struct mrb_data_type mrb_curses_data_type = {
   "mrb_curses_data", mrb_free,
 };
+
+static const struct mrb_data_type windata_type = {
+  "windata", mrb_free,
+};
+/*
+static mrb_value mrb_window_wrap(mrb_state *mrb, struct RClass *window, struct mrb_time *tm)
+{
+  return mrb_obj_value(Data_Wrap_Struct(mrb, window, &windata_type, tm));
+}
+*/
 
 static mrb_value mrb_curses_init(mrb_state *mrb, mrb_value self)
 {
@@ -44,6 +58,8 @@ static mrb_value mrb_curses_init(mrb_state *mrb, mrb_value self)
 
   return self;
 }
+
+
 
 static mrb_value
 mrb_curses_initscr(mrb_state *mrb, mrb_value self)
@@ -121,9 +137,30 @@ mrb_curses_move(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_curses_newwin(mrb_state *mrb, mrb_value self)
 {
+  struct windata *winp;
   mrb_value nlines, ncols, begin_y, begin_x;
   mrb_get_args(mrb, "iiii", &nlines, &ncols, &begin_y, &begin_x);
-  WINDOW *newwin(mrb_fixnum(nlines), mrb_fixnum(ncols), mrb_fixnum(begin_y), mrb_fixnum(begin_x));
+  WINDOW *window;
+
+  //winp = mrb_get_datatype(mrb, obj, &windata_type);
+  window = newwin(mrb_fixnum(nlines), mrb_fixnum(ncols), mrb_fixnum(begin_y), mrb_fixnum(begin_x));
+
+  winp->window = window;
+  //return mrb_obj_value(window);
+  //return obj;
+  return mrb_bool_value(true);
+}
+
+static mrb_value
+mrb_curses_waddstr(mrb_state *mrb, mrb_value self)
+{
+  struct windata *winp;
+  mrb_value str, win;
+  mrb_get_args(mrb, "oS", &win, &str);
+  const char *body = mrb_string_value_ptr(mrb, str);
+
+  winp = mrb_get_datatype(mrb, win, &windata_type);
+  waddstr(winp->window, body);
   return mrb_bool_value(true);
 }
 
@@ -154,6 +191,7 @@ void mrb_mruby_curses_gem_init(mrb_state *mrb)
     mrb_define_class_method(mrb, curses, "move", mrb_curses_move, MRB_ARGS_ANY());
     mrb_define_class_method(mrb, curses, "endwin", mrb_curses_endwin, MRB_ARGS_NONE());
     mrb_define_class_method(mrb, curses, "newwin", mrb_curses_newwin, MRB_ARGS_ANY());
+    mrb_define_class_method(mrb, curses, "waddstr", mrb_curses_waddstr, MRB_ARGS_ANY());
     //mrb_define_class_method(mrb, curses, "getmaxyx", mrb_curses_getmaxyx, MRB_ARGS_NONE());
     DONE;
 }
