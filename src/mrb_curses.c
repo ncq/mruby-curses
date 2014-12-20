@@ -16,6 +16,11 @@
 #define DONE mrb_gc_arena_restore(mrb, 0);
 
 // static mrb_value rb_stdscr;
+struct windata {
+  WINDOW *window;
+};
+
+WINDOW *echo_win = NULL;
 
 typedef struct {
   char *str;
@@ -170,6 +175,58 @@ mrb_curses_wbkgd(mrb_state *mrb, mrb_value self)
   return mrb_bool_value(true);
 }
 
+static mrb_value
+mrb_curses_echoline(mrb_state *mrb, mrb_value self)
+{
+  int h, w;
+
+  getmaxyx(stdscr, h, w);
+  if (echo_win == NULL) {
+    echo_win = subwin(stdscr, 1, 100, h-1, 3);
+  }
+
+  return mrb_bool_value(true);
+}
+
+static mrb_value
+mrb_curses_ewaddstr(mrb_state *mrb, mrb_value self)
+{
+  if (echo_win == NULL) {
+    return mrb_bool_value(false);
+  }
+
+  mrb_value obj;
+  mrb_get_args(mrb, "S", &obj);
+  const char *body = mrb_string_value_ptr(mrb, obj);
+  waddstr(echo_win, body);
+
+  return mrb_bool_value(true);
+}
+
+static mrb_value
+mrb_curses_ewmove(mrb_state *mrb, mrb_value self)
+{
+  if (echo_win == NULL) {
+    return mrb_bool_value(false);
+  }
+
+  mrb_value v1, v2;
+  mrb_get_args(mrb, "ii", &v1, &v2);
+  wmove(echo_win, mrb_fixnum(v1), mrb_fixnum(v2));
+  return mrb_bool_value(true);
+}
+
+static mrb_value
+mrb_curses_refresh(mrb_state *mrb, mrb_value self)
+{
+  refresh();
+  if (echo_win != NULL) {
+    wrefresh(echo_win);
+  }
+
+  return mrb_bool_value(true);
+}
+
 void mrb_mruby_curses_gem_init(mrb_state *mrb)
 {
     struct RClass *curses;
@@ -190,6 +247,11 @@ void mrb_mruby_curses_gem_init(mrb_state *mrb)
     mrb_define_class_method(mrb, curses, "coloron", mrb_curses_coloron, MRB_ARGS_REQ(1));
     mrb_define_class_method(mrb, curses, "coloroff", mrb_curses_coloroff, MRB_ARGS_REQ(1));
     mrb_define_class_method(mrb, curses, "wbkgd", mrb_curses_wbkgd, MRB_ARGS_REQ(1));
+
+    mrb_define_class_method(mrb, curses, "echoline", mrb_curses_echoline, MRB_ARGS_NONE());
+    mrb_define_class_method(mrb, curses, "ewaddstr", mrb_curses_ewaddstr, MRB_ARGS_REQ(1));
+    mrb_define_class_method(mrb, curses, "ewmove", mrb_curses_ewmove, MRB_ARGS_ANY());
+    mrb_define_class_method(mrb, curses, "refresh", mrb_curses_refresh, MRB_ARGS_NONE());
 
     mrb_define_const(mrb, curses, "COLOR_BLACK",  mrb_fixnum_value(COLOR_BLACK));
     mrb_define_const(mrb, curses, "COLOR_RED",  mrb_fixnum_value(COLOR_RED));
