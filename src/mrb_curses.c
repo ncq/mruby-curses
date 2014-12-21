@@ -259,6 +259,22 @@ mrb_curses_ewgetstr(mrb_state *mrb, mrb_value self)
   return s;
 }
 
+static mrb_value
+mrb_curses_screen_rows(mrb_state *mrb, mrb_value self)
+{
+  int rows, cols;
+  getmaxyx(stdscr, rows, cols);
+  return mrb_fixnum_value(rows);
+}
+
+static mrb_value
+mrb_curses_screen_cols(mrb_state *mrb, mrb_value self)
+{
+  int rows, cols;
+  getmaxyx(stdscr, rows, cols);
+  return mrb_fixnum_value(cols);
+}
+
 void mrb_mruby_curses_gem_init(mrb_state *mrb)
 {
     struct RClass *curses;
@@ -287,6 +303,9 @@ void mrb_mruby_curses_gem_init(mrb_state *mrb)
     mrb_define_class_method(mrb, curses, "ewmove", mrb_curses_ewmove, MRB_ARGS_ANY());
     mrb_define_class_method(mrb, curses, "refresh", mrb_curses_refresh, MRB_ARGS_NONE());
     mrb_define_class_method(mrb, curses, "ewgetstr", mrb_curses_ewgetstr, MRB_ARGS_NONE());
+
+    mrb_define_class_method(mrb, curses, "screen_rows", mrb_curses_screen_rows, MRB_ARGS_NONE());
+    mrb_define_class_method(mrb, curses, "screen_cols", mrb_curses_screen_cols, MRB_ARGS_NONE());
 
     mrb_define_const(mrb, curses, "COLOR_BLACK",  mrb_fixnum_value(COLOR_BLACK));
     mrb_define_const(mrb, curses, "COLOR_RED",  mrb_fixnum_value(COLOR_RED));
