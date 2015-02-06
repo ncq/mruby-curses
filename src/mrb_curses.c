@@ -199,7 +199,6 @@ mrb_curses_echoline(mrb_state *mrb, mrb_value self)
   h = mrb_fixnum(height);
   w = mrb_fixnum(width);
 
-  getmaxyx(stdscr, h, w);
   if (echo_win == NULL) {
     echo_win = subwin(stdscr, 1, 100, h, w);
   }
