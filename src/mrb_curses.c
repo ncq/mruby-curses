@@ -203,6 +203,20 @@ mrb_curses_echoline(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
+mrb_curses_change_echo_position(mrb_state *mrb, mrb_value self)
+{
+  int h, w;
+  mrb_get_args(mrb, "ii", &height, &width);
+  h = mrb_fixnum(height);
+  w = mrb_fixnum(width);
+  if (echo_win == NULL) {
+    echo_win = subwin(stdscr, 1, 100, h, w);
+  }
+
+  return mrb_bool_value(true);
+}
+
+static mrb_value
 mrb_curses_ewaddstr(mrb_state *mrb, mrb_value self)
 {
   if (echo_win == NULL) {
@@ -303,6 +317,7 @@ void mrb_mruby_curses_gem_init(mrb_state *mrb)
     mrb_define_class_method(mrb, curses, "ewmove", mrb_curses_ewmove, MRB_ARGS_ANY());
     mrb_define_class_method(mrb, curses, "refresh", mrb_curses_refresh, MRB_ARGS_NONE());
     mrb_define_class_method(mrb, curses, "ewgetstr", mrb_curses_ewgetstr, MRB_ARGS_NONE());
+    mrb_define_class_method(mrb, curses, "change_echo_position", mrb_curses_change_echo_position, MRB_ARGS_ANY());
 
     mrb_define_class_method(mrb, curses, "screen_rows", mrb_curses_screen_rows, MRB_ARGS_NONE());
     mrb_define_class_method(mrb, curses, "screen_cols", mrb_curses_screen_cols, MRB_ARGS_NONE());
